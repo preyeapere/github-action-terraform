@@ -1,6 +1,16 @@
 name: Automate HA EC2 Infrastructure Provisioning
 
 on:
+
+  workflow_dispatch:
+    inputs:
+      terraform_action:
+        type: choice
+        description: select terraform action
+        options:
+        - apply
+        - destroy
+        required: true
   push:
     branches:
       - main
@@ -60,9 +70,18 @@ jobs:
 
     - name: Terraform Plan
       id: plan
-      run: terraform plan -no-color
+      run: terraform plan -no-color 
 
-    - name: Terraform Destroy
-      id: destroy
+    - name: 
+      id: apply 
+      if: ${{ github.event.inputs.terraform_action == 'apply' }}
+      run: terraform apply -auto-approve
+
+    - name: Terraform destroy
+      id: destroy 
+      if: ${{ github.event.inputs.terraform_action == 'apply' }}
       run: terraform destroy -auto-approve
       #if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+      
+    
